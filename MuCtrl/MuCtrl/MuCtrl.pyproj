@@ -26,6 +26,9 @@
     <Compile Include="Measurement.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="MicroController.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="MuCtrl.py" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />

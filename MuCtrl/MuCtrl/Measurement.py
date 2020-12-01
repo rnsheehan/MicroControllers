@@ -20,6 +20,13 @@ Vin3 = AnalogIn(board.A3)
 Vin4 = AnalogIn(board.A4)
 Vin5 = AnalogIn(board.A5)
 
+# Define the names of the read / write commands
+readCmdStr = 'r'; # read data command string for reading max AC input
+writeCmdStr = 'w'; # write data command string for writing frequency values
+writeAngStrA = 'a'; # write analog output from DCPINA
+writeAngStrB = 'b'; # write analog output from DCPINB
+readAngStr = 'l'; # read analog input
+
 # Define the constants
 Vmax = 3.3 # max AO/AI value
 bit_scale = (64*1024) # 64 bits
@@ -191,9 +198,9 @@ def Cuffe_Iface():
         while True:
             if supervisor.runtime.serial_bytes_available:   # Listens for a serial command
                 command = input()
-                if command.startswith("o"):                 # If the command starts with 'o' it knows it is an output (Write)
+                if command.startswith(writeAngStrA):        # If the command starts with writeAngStrA it knows it is an output (Write)
                     try:                                    # In case user inputs NAN somehow
-                        SetVoltage = float(command[1:])     # Everything after the 'o' is the voltage
+                        SetVoltage = float(command[1:])     # Everything after the writeAngStrA is the voltage
                         if SetVoltage >= 0.0 and SetVoltage < 3.3: # Sets limits on the Output voltage to board specs
                             Vout.value = dac_value(SetVoltage) # Set the voltage
                         else:
@@ -201,7 +208,7 @@ def Cuffe_Iface():
                     except ValueError:
                         ERR_STATEMENT = ERR_STATEMENT + '\nVin must be a float'
                         raise Exception
-                elif command.startswith("l"):                # If the command starts with 'i' it knows user is looking for Vin. (Read)
+                elif command.startswith(readAngStr):        # If the command starts with readAngStr it knows user is looking for Vin. (Read)
                     # in the scheme I have set up
                     # A1 measures Ground, A2 measures Vctrl-high, A3 measures Vr3-high, A4 measures Vr3-low, A5 measures Vrl-high
                     # Measurement at ground can be substracted off where required
@@ -209,8 +216,8 @@ def Cuffe_Iface():
                     #print(get_voltage(Vin2))
                     #print(Vin1.value)
                 else:
-                    #print(get_voltage(Vin1), get_voltage(Vin2), get_voltage(Vin3), get_voltage(Vin4), get_voltage(Vin5)) # Prints to serial to be read by LabView
-                    print(get_voltage(Vin2))
+                    print(get_voltage(Vin1), get_voltage(Vin2), get_voltage(Vin3), get_voltage(Vin4), get_voltage(Vin5)) # Prints to serial to be read by LabView
+                    #print(get_voltage(Vin2))
                     #print(Vin1.value)
     except Exception as e:
         print(ERR_STATEMENT)
@@ -250,7 +257,7 @@ def AC_Read():
         while True:
             if supervisor.runtime.serial_bytes_available:   # Listens for a serial command
                 command = input()
-                if command.startswith("i"):                # If the command starts with 'i' it knows user is looking for Vin. (Read)
+                if command.startswith(readCmdStr):  # If the command starts with readCmdStr it knows user is looking for Vin. (Read)
                     count = 0
                     count_lim = 500
                     #count_lim = 3e+4 # i think this is close to the upper limit
@@ -293,7 +300,7 @@ def AC_Max():
         while True:
             if supervisor.runtime.serial_bytes_available:   # Listens for a serial command
                 command = input()
-                if command.startswith("i"):                # If the command starts with 'i' it knows user is looking for Vin. (Read)
+                if command.startswith(readCmdStr):                # If the command starts with readCmdStr it knows user is looking for Vin. (Read)
                     #print(get_voltage(Vin1), get_voltage(Vin2), get_voltage(Vin3), get_voltage(Vin4), get_voltage(Vin5)) # Prints to serial to be read by LabView
                     max_val = 0.0
                     count = 0
